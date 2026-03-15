@@ -12,7 +12,7 @@ bp = Blueprint('bookings', __name__, url_prefix='/api/bookings')
 def create_booking():
     """Create a new booking"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         user = User.query.get(user_id)
         
         if not user or user.role != 'customer':
@@ -21,30 +21,37 @@ def create_booking():
         data = request.get_json()
         
         # Validate required fields
-        if not data or not data.get('provider_id') or not data.get('service_id'):
+        if not data or not data.get('provider_id'):
             return jsonify({"error": "Missing required fields", "code": "VALIDATION_ERROR"}), 400
         
-        # Verify service and provider
-        service = Service.query.get(data['service_id'])
-        if not service:
-            return jsonify({"error": "Service not found", "code": "NOT_FOUND"}), 404
-        
-        provider = Provider.query.get(data['provider_id'])
-        if not provider:
+        # Verify provider
+        provider_user = User.query.get(data['provider_id'])
+        if not provider_user or provider_user.role != 'provider':
             return jsonify({"error": "Provider not found", "code": "NOT_FOUND"}), 404
+        
+        provider = Provider.query.filter_by(user_id=provider_user.id).first()
+        if not provider:
+            return jsonify({"error": "Provider profile not found", "code": "NOT_FOUND"}), 404
+        
+        # If service_id is provided, verify it
+        service = None
+        if data.get('service_id'):
+            service = Service.query.get(data['service_id'])
+            if not service or service.provider_id != provider.id:
+                return jsonify({"error": "Service not found", "code": "NOT_FOUND"}), 404
         
         # Create booking
         booking = Booking(
             customer_id=user_id,
-            provider_id=provider.user_id,
-            service_id=service.id,
-            status='pending',
+            provider_id=provider_user.id,
+            service_id=service.id if service else None,
+            status=data.get('status', 'pending'),
             scheduled_at=datetime.fromisoformat(data['scheduled_at']) if data.get('scheduled_at') else None,
             address=data.get('address'),
             latitude=data.get('latitude'),
             longitude=data.get('longitude'),
             description=data.get('description'),
-            final_price=data.get('final_price', service.price),
+            final_price=data.get('final_price', service.price if service else 0),
             ai_extracted_data=data.get('ai_extracted_data', {}),
             notes=data.get('notes')
         )
@@ -52,15 +59,31 @@ def create_booking():
         db.session.add(booking)
         db.session.commit()
         
+        # Return booking with provider details
         return jsonify({
-            "data": booking.to_dict(),
-            "message": "Booking created successfully"
+            'data': {
+                'booking': booking.to_dict(),
+                'provider': {
+                    'id': provider_user.id,
+                    'name': provider_user.name,
+                    'email': provider_user.email,
+                    'phone': provider_user.phone,
+                    'city': provider_user.city,
+                    'is_female': provider_user.is_female,
+                    'profile_photo': provider_user.profile_photo,
+                    'rating': provider.rating,
+                    'trust_badge': provider.trust_badge,
+                }
+            },
+            'message': 'Booking created successfully'
         }), 201
     
     except ValueError as e:
         return jsonify({"error": f"Invalid date format: {str(e)}", "code": "VALIDATION_ERROR"}), 400
     except Exception as e:
         db.session.rollback()
+        import traceback
+        print(traceback.format_exc())
         return jsonify({"error": str(e), "code": "CREATE_ERROR"}), 500
 
 
@@ -69,7 +92,7 @@ def create_booking():
 def my_bookings():
     """Get current customer's bookings"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         user = User.query.get(user_id)
         
         if not user or user.role != 'customer':
@@ -111,7 +134,7 @@ def my_bookings():
 def assigned_bookings():
     """Get provider's assigned bookings"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         user = User.query.get(user_id)
         
         if not user or user.role != 'provider':
@@ -172,7 +195,7 @@ def get_booking(booking_id):
 def update_booking_status(booking_id):
     """Update booking status"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         booking = Booking.query.get(booking_id)
         
         if not booking:

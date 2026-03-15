@@ -121,7 +121,7 @@ def get_provider(provider_id):
 @jwt_required()
 def update_provider(provider_id):
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         user = User.query.get(user_id)
 
         if not user or user.role != 'provider' or user.id != provider_id:
@@ -161,7 +161,7 @@ def update_provider(provider_id):
 @jwt_required()
 def verify_provider(provider_id):
     try:
-        current_user_id = get_jwt_identity()
+        current_user_id = int(get_jwt_identity())
         current_user = User.query.get(current_user_id)
 
         if not current_user or current_user.role != 'admin':
@@ -251,7 +251,7 @@ def get_nearby_providers():
 @jwt_required()
 def get_my_profile():
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         user = User.query.get(user_id)
 
         if not user or user.role != 'provider':
@@ -275,3 +275,22 @@ def get_my_profile():
         import traceback
         print(traceback.format_exc())
         return jsonify({"error": str(e), "code": "FETCH_ERROR"}), 500
+
+
+@bp.route('/cities', methods=['GET'])
+def get_cities():
+    try:
+        cities = db.session.query(User.city).filter(
+            User.role == 'provider',
+            User.city != None,
+            User.city != ''
+        ).distinct().order_by(User.city).all()
+        
+        return jsonify({
+            'data': [c[0] for c in cities if c[0]],
+            'message': 'Cities fetched'
+        }), 200
+    except Exception as e:
+        import traceback
+        print(traceback.format_exc())
+        return jsonify({"error": str(e), "code": "CITIES_ERROR"}), 500

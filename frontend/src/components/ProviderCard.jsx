@@ -2,20 +2,17 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { Star, MapPin, Heart } from 'lucide-react'
 import { useLanguage } from '../context/LanguageContext'
+import Avatar from './Avatar'
 
 export default function ProviderCard({ provider, user }) {
   const { t } = useLanguage()
   return (
     <div className="provider-card-hover bg-white rounded-lg overflow-hidden border border-gray-200">
       {/* Provider Photo */}
-      <div className="relative h-48 bg-gradient-to-br from-primary-100 to-primary-200">
-        {user?.profile_photo ? (
-          <img src={user.profile_photo} alt={user?.name} className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-primary-700">
-            <span className="text-6xl">👤</span>
-          </div>
-        )}
+      <div className="relative h-48 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
+        <div className="scale-150">
+          <Avatar provider={user} size="lg" />
+        </div>
         
         {/* Women First Badge */}
         {user?.is_female && (
@@ -71,14 +68,16 @@ export default function ProviderCard({ provider, user }) {
         {/* Buttons */}
         <div className="flex gap-2">
           <Link
-            to={`/provider/${provider?.id}`}
-            className="flex-1 px-3 py-2 bg-primary-100 text-primary-700 rounded-lg font-semibold hover:bg-primary-200 transition-colors text-sm text-center"
+            to={`/provider/${user?.id}`}
+            className="flex-1 py-2.5 border border-gray-200 text-gray-700 
+                       rounded-xl font-semibold text-sm text-center hover:bg-gray-50"
           >
             {t('viewProfile')}
           </Link>
           <Link
-            to="/booking"
-            className="flex-1 px-3 py-2 bg-primary-700 text-white rounded-lg font-semibold hover:bg-primary-800 transition-colors text-sm text-center"
+            to={`/booking?provider_id=${user?.id}&service_id=${provider?.services?.[0]?.id || ''}`}
+            className="flex-1 py-2.5 bg-purple-600 text-white rounded-xl 
+                       font-semibold text-sm text-center hover:bg-purple-700"
           >
             {t('bookNow')}
           </Link>

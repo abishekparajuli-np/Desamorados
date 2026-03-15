@@ -3,6 +3,7 @@ import { Calendar, MapPin, DollarSign, Star, Plus } from 'lucide-react'
 import api from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
+import ChatWithProvider from '../../components/ChatWithProvider'
 
 export default function CustomerDashboard() {
   const { t } = useLanguage()
@@ -131,9 +132,12 @@ export default function CustomerDashboard() {
                   </div>
                 </div>
 
-                <button className="px-6 py-2 bg-primary-700 text-white rounded-lg font-semibold hover:bg-primary-800 transition-colors">
-                  विस्तृत विवरण देखुन्नुहोस्
-                </button>
+                <div className="flex gap-3">
+                  <ChatWithProvider booking={booking} provider={booking.provider_details} />
+                  <button className="px-6 py-2 bg-primary-700 text-white rounded-lg font-semibold hover:bg-primary-800 transition-colors">
+                    विस्तृत विवरण देखुन्नुहोस्
+                  </button>
+                </div>
               </div>
             ))}
           </div>

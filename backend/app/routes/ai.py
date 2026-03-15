@@ -34,7 +34,7 @@ def rate_limit(max_requests=20, window=60):
     def decorator(f):
         @wraps(f)
         def decorated(*args, **kwargs):
-            user_id = get_jwt_identity() if request.headers.get('Authorization') else 'anon'
+            user_id = int(get_jwt_identity()) if request.headers.get('Authorization') else 'anon'
             now = datetime.utcnow()
             key = f"{user_id}:{now.minute}"
             

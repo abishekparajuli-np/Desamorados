@@ -22,6 +22,12 @@ const translations = {
     
     // Services
     allServices: 'All Services',
+    filters: 'Filters',
+    city: 'City',
+    allCities: 'All Cities',
+    resetFilters: 'Reset Filters',
+    listView: 'List View',
+    mapView: 'Map View',
     filterByCity: 'Filter by City',
     filterByCategory: 'Filter by Category',
     showWomenFirst: 'Show Women Providers First 💜',
@@ -115,6 +121,12 @@ const translations = {
     
     // Services
     allServices: 'सबै सेवाहरू',
+    filters: 'फिल्टरहरू',
+    city: 'शहर',
+    allCities: 'सबै शहरहरू',
+    resetFilters: 'फिल्टरहरू रिसेट गर्नुहोस्',
+    listView: 'सूची दृश्य',
+    mapView: 'नक्सा दृश्य',
     filterByCity: 'शहर अनुसार छान्नुहोस्',
     filterByCategory: 'श्रेणी अनुसार छान्नुहोस्',
     showWomenFirst: 'महिला प्रदायक पहिले देखाउनुहोस् 💜',

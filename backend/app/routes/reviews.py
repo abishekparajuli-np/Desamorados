@@ -13,7 +13,7 @@ ai_service = AIService()
 def create_review():
     """Submit a review for a completed booking"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         user = User.query.get(user_id)
         
         if not user or user.role != 'customer':

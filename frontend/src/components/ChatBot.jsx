@@ -25,6 +25,17 @@ export default function ChatBot() {
     scrollToBottom()
   }, [messages])
 
+  useEffect(() => {
+    const handleOpen = (e) => {
+      setIsOpen(true)
+      if (e.detail) {
+        setInputValue(e.detail)
+      }
+    }
+    window.addEventListener('openChatBot', handleOpen)
+    return () => window.removeEventListener('openChatBot', handleOpen)
+  }, [])
+
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return
 

@@ -20,11 +20,19 @@ export default function Login() {
     try {
       const data = await login(email, password)
       
-      // Redirect based on role
-      const role = data.user?.role
-      if (role === 'admin') navigate('/admin')
-      else if (role === 'provider') navigate('/dashboard/provider')
-      else navigate('/dashboard/customer')
+      // Check for redirect parameter
+      const searchParams = new URLSearchParams(window.location.search)
+      const redirectTo = searchParams.get('redirect')
+      
+      if (redirectTo) {
+        navigate(redirectTo)
+      } else {
+        // Redirect based on role
+        const role = data.user?.role
+        if (role === 'admin') navigate('/admin')
+        else if (role === 'provider') navigate('/dashboard/provider')
+        else navigate('/dashboard/customer')
+      }
       
     } catch (err) {
       setError(err.response?.data?.error || 'Login failed')

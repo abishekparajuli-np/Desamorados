@@ -21,23 +21,48 @@ export default function Services() {
     min_rating: 0,
     page: 1
   })
+  const [cities, setCities] = useState([])
 
   useEffect(() => {
     loadProviders()
+    loadCities()
   }, [filters])
+
+  const loadCities = async () => {
+    try {
+      const response = await api.get('/api/providers')
+      const providers = 
+        response.data?.data?.providers ||
+        response.data?.providers ||
+        response.data?.data ||
+        response.data ||
+        []
+      const uniqueCities = [...new Set(
+        Array.isArray(providers) 
+          ? providers
+              .map(p => p.city || p.provider?.city)
+              .filter(Boolean)
+          : []
+      )]
+      setCities(uniqueCities.sort())
+    } catch (error) {
+      console.error('Failed to load cities:', error)
+    }
+  }
 
   const loadProviders = async () => {
     try {
       setLoading(true)
-      const response = await api.get('/api/providers', {
-        params: {
-          city: filters.city || undefined,
-          women_first: filters.women_first,
-          min_rating: filters.min_rating,
-          page: filters.page,
-          per_page: 12
-        }
-      })
+      const params = {
+        women_first: filters.women_first,
+        min_rating: filters.min_rating,
+        page: filters.page,
+        per_page: 12,
+      }
+      if (filters.city && filters.city !== '') {
+        params.city = filters.city
+      }
+      const response = await api.get('/api/providers', { params })
       const providers = 
         response.data?.data?.providers ||
         response.data?.providers ||
@@ -55,8 +80,6 @@ export default function Services() {
   const toggleWomenFirst = () => {
     setFilters(prev => ({ ...prev, women_first: !prev.women_first, page: 1 }))
   }
-
-  const cities = ['काठमाडौ', 'ललितपुर', 'भक्तपुर', 'पोखरा', 'वीरगंज']
 
   // Handle provider click on map
   const handleProviderClick = (providerId) => {
@@ -83,7 +106,7 @@ export default function Services() {
               }`}
             >
               <Grid size={18} />
-              सूची
+              {t('listView')}
             </button>
             <button
               onClick={() => setViewMode('map')}
@@ -94,7 +117,7 @@ export default function Services() {
               }`}
             >
               <Map size={18} />
-              नक्शा
+              {t('mapView')}
             </button>
           </div>
         </div>
@@ -106,7 +129,7 @@ export default function Services() {
             <div className={`${showFilters ? 'block' : 'hidden'} md:block md:w-64`}>
               <div className="bg-white rounded-lg shadow-md p-6 sticky top-20">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="font-bold text-lg">फिल्टरहरू</h3>
+                  <h3 className="font-bold text-lg">{t('filters')}</h3>
                   <button 
                     onClick={() => setShowFilters(false)}
                     className="md:hidden"
@@ -124,19 +147,19 @@ export default function Services() {
                       onChange={toggleWomenFirst}
                       className="w-5 h-5 accent-primary-700"
                     />
-                    <span className="font-semibold text-primary-700">💜 महिला पहिले</span>
+                    <span className="font-semibold text-primary-700">💜 {t('showWomenFirst')}</span>
                   </label>
                 </div>
 
                 {/* City Filter */}
                 <div className="mb-6">
-                  <label className="block font-semibold mb-3">शहर</label>
+                  <label className="block font-semibold mb-3">{t('city')}</label>
                   <select
                     value={filters.city}
                     onChange={(e) => setFilters(prev => ({ ...prev, city: e.target.value, page: 1 }))}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
-                    <option value="">सबै शहरहरू</option>
+                    <option value="">{t('allCities')}</option>
                     {cities.map(city => (
                       <option key={city} value={city}>{city}</option>
                     ))}
@@ -164,7 +187,7 @@ export default function Services() {
                   }}
                   className="w-full px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
                 >
-                  फिल्टरहरू रिसेट गर्नुहोस्
+                  {t('resetFilters')}
                 </button>
               </div>
             </div>
@@ -176,7 +199,7 @@ export default function Services() {
                 className="md:hidden mb-4 px-4 py-2 bg-primary-700 text-white rounded-lg flex items-center gap-2"
               >
                 <Filter size={20} />
-                फिल्टरहरू
+                {t('filters')}
               </button>
 
               {loading ? (
@@ -195,8 +218,8 @@ export default function Services() {
                 </div>
               ) : (
                 <div className="bg-white rounded-lg shadow-md p-12 text-center">
-                  <p className="text-gray-600 text-lg">कोनै सेवा प्रदान गर्नेहरू नहिंसे।</p>
-                  <p className="text-gray-500 mt-2">फिल्टरहरू परिवर्तन गर्न प्रयास गर्नुहोस्।</p>
+                  <p className="text-gray-600 text-lg">{t('noProvidersNearby')}</p>
+                  <p className="text-gray-500 mt-2">{t('tryIncreasing')}</p>
                 </div>
               )}
             </div>
@@ -227,7 +250,7 @@ export default function Services() {
                     onChange={toggleWomenFirst}
                     className="w-5 h-5 accent-primary-700"
                   />
-                  <span className="font-semibold text-primary-700">💜 महिला पहिले</span>
+                  <span className="font-semibold text-primary-700">💜 {t('showWomenFirst')}</span>
                 </label>
               </div>
 
@@ -252,14 +275,14 @@ export default function Services() {
                         </div>
                       </div>
                       <button className="w-full px-4 py-2 bg-primary-700 text-white rounded-lg font-semibold hover:bg-primary-800 transition">
-                        अहिले बुक गर्नुहोस्
+                        {t('bookNow')}
                       </button>
                     </>
                   )}
                 </div>
               ) : (
                 <div className="text-center text-gray-500 py-8">
-                  <p>नक्शामा सेवा प्रदान गर्नेलाई क्लिक गर्नुहोस्</p>
+                  <p>{t('clickMapToMove')}</p>
                   <p className="text-sm mt-2">विवरण यहाँ देखा पर्नेछ</p>
                 </div>
               )}

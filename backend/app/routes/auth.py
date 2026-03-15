@@ -44,8 +44,8 @@ def register():
         db.session.commit()
         
         # Generate tokens
-        access_token = create_access_token(identity=user.id)
-        refresh_token = create_refresh_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
+        refresh_token = create_refresh_token(identity=str(user.id))
         
         return jsonify({
             "data": {
@@ -76,8 +76,8 @@ def login():
             return jsonify({"error": "Invalid email or password", "code": "AUTH_FAILED"}), 401
         
         # Generate tokens
-        access_token = create_access_token(identity=user.id)
-        refresh_token = create_refresh_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))   # RIGHT - string
+        refresh_token = create_refresh_token(identity=str(user.id)) # RIGHT - string
         
         return jsonify({
             "data": {
@@ -97,8 +97,8 @@ def login():
 def refresh():
     """Refresh access token"""
     try:
-        user_id = get_jwt_identity()
-        access_token = create_access_token(identity=user_id)
+        user_id = int(get_jwt_identity())
+        access_token = create_access_token(identity=str(user_id))
         
         return jsonify({
             "data": {"access_token": access_token},
@@ -114,7 +114,7 @@ def refresh():
 def get_current_user():
     """Get current logged-in user"""
     try:
-        user_id = get_jwt_identity()
+        user_id = int(get_jwt_identity())
         user = User.query.get(user_id)
         
         if not user:
