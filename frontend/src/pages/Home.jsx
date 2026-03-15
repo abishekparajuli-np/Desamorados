@@ -4,9 +4,11 @@ import { Search, Users, Shield, MapPin, Zap } from 'lucide-react'
 import ProviderCard from '../components/ProviderCard'
 import api from '../api/client'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function Home() {
   const { isAuthenticated } = useAuth()
+  const { t } = useLanguage()
   const [featuredProviders, setFeaturedProviders] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(false)

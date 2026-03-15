@@ -4,8 +4,10 @@ import { Filter, X, Map, Grid } from 'lucide-react'
 import ProviderCard from '../components/ProviderCard'
 import ProvidersMap from '../components/ProvidersMap'
 import api from '../api/client'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function Services() {
+  const { t } = useLanguage()
   const [providers, setProviders] = useState([])
   const [loading, setLoading] = useState(false)
   const [showFilters, setShowFilters] = useState(false)
@@ -67,8 +69,7 @@ export default function Services() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex justify-between items-start mb-8">
           <div>
-            <h1 className="text-4xl font-bold mb-2 text-gray-800">सेवा प्रदान गर्नेहरू</h1>
-            <p className="text-gray-600">नेपालमा हजारौ सेवा प्रदान गर्नेहरूबाट चुनौं</p>
+          <h1 className="text-4xl font-bold mb-2 text-gray-800">{t('allServices')}</h1>
           </div>
           
           {/* View Mode Toggle */}

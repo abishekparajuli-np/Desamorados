@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function Login() {
+  const { t } = useLanguage()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -35,7 +37,7 @@ export default function Login() {
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-purple-50 flex items-center justify-center px-4">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
         <h1 className="text-3xl font-bold text-center mb-2 text-primary-700">
-          सेवासाथीमा लग इन गर्नुहोस्
+          {t('loginTitle')}
         </h1>
         <p className="text-center text-gray-600 mb-8">आपको खाता वर्तमान राख्नुहोस्</p>
 
@@ -48,7 +50,7 @@ export default function Login() {
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
             <label className="block text-gray-700 font-semibold mb-2">
-              ईमेल
+              {t('email')}
             </label>
             <input
               type="email"
@@ -62,7 +64,7 @@ export default function Login() {
 
           <div className="mb-6">
             <label className="block text-gray-700 font-semibold mb-2">
-              पासवर्ड
+              {t('password')}
             </label>
             <input
               type="password"
@@ -79,14 +81,14 @@ export default function Login() {
             disabled={loading}
             className="w-full bg-primary-700 text-white font-semibold py-3 rounded-lg hover:bg-primary-800 transition-colors disabled:opacity-50"
           >
-            {loading ? 'लग इन हो रहेको छ...' : 'लग इन गर्नुहोस्'}
+            {loading ? 'लग इन हो रहेको छ...' : t('login')}
           </button>
         </form>
 
         <p className="text-center text-gray-600 mt-6">
-          खाता छैनन्?{' '}
+          {t('noAccount')}{' '}
           <Link to="/register" className="text-primary-700 font-semibold hover:underline">
-            अभी दर्ता गर्नुहोस्
+            {t('signUp')}
           </Link>
         </p>
 

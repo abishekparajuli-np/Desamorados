@@ -6,43 +6,71 @@ const AuthContext = createContext({})
 export const useAuth = () => useContext(AuthContext)
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState(() => {
+    // Initialize from localStorage SYNCHRONOUSLY
+    // This prevents flash of logged-out state on refresh
+    try {
+      const savedUser = localStorage.getItem('user')
+      return savedUser ? JSON.parse(savedUser) : null
+    } catch {
+      return null
+    }
+  })
   const [loading, setLoading] = useState(true)
 
-  // On app load, restore user from localStorage
   useEffect(() => {
-    const restoreAuth = async () => {
+    const verifyToken = async () => {
       const token = localStorage.getItem('access_token')
       if (!token) {
         setLoading(false)
         return
       }
       try {
+        // Verify token is still valid with backend
         const res = await client.get('/api/auth/me')
         const userData = res.data?.data || res.data
         setUser(userData)
+        localStorage.setItem('user', JSON.stringify(userData))
       } catch (err) {
-        // Token expired or invalid — clear it
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
-        localStorage.removeItem('user')
-        setUser(null)
+        // Token invalid — try refresh first
+        const refreshToken = localStorage.getItem('refresh_token')
+        if (refreshToken) {
+          try {
+            const res = await client.post('/api/auth/refresh', {}, {
+              headers: { Authorization: `Bearer ${refreshToken}` }
+            })
+            const newToken = res.data?.data?.access_token || res.data?.access_token
+            localStorage.setItem('access_token', newToken)
+            // Retry /me with new token
+            const meRes = await client.get('/api/auth/me')
+            const userData = meRes.data?.data || meRes.data
+            setUser(userData)
+            localStorage.setItem('user', JSON.stringify(userData))
+          } catch {
+            // Refresh failed — clear everything
+            localStorage.removeItem('access_token')
+            localStorage.removeItem('refresh_token')
+            localStorage.removeItem('user')
+            setUser(null)
+          }
+        } else {
+          localStorage.removeItem('access_token')
+          localStorage.removeItem('user')
+          setUser(null)
+        }
       } finally {
         setLoading(false)
       }
     }
-    restoreAuth()
+    verifyToken()
   }, [])
 
   const login = async (email, password) => {
     const res = await client.post('/api/auth/login', { email, password })
     const data = res.data?.data || res.data
-
-    // Save tokens to localStorage
     localStorage.setItem('access_token', data.access_token)
     localStorage.setItem('refresh_token', data.refresh_token)
     localStorage.setItem('user', JSON.stringify(data.user))
-
     setUser(data.user)
     return data
   }
@@ -57,12 +85,9 @@ export const AuthProvider = ({ children }) => {
       city
     })
     const data = res.data?.data || res.data
-
-    // Save tokens to localStorage
     localStorage.setItem('access_token', data.access_token)
     localStorage.setItem('refresh_token', data.refresh_token)
     localStorage.setItem('user', JSON.stringify(data.user))
-
     setUser(data.user)
     return data
   }
@@ -72,7 +97,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('refresh_token')
     localStorage.removeItem('user')
     setUser(null)
-    window.location.href = '/login'
+    window.location.href = '/'
   }
 
   const updateUser = (updatedUser) => {
@@ -90,7 +115,7 @@ export const AuthProvider = ({ children }) => {
       logout,
       updateUser
     }}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   )
 }

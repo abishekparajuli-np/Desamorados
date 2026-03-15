@@ -1,8 +1,10 @@
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function Register() {
+  const { t } = useLanguage()
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -54,7 +56,7 @@ export default function Register() {
     <div className="min-h-screen bg-gradient-to-br from-primary-50 to-purple-50 flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-md bg-white rounded-lg shadow-lg p-8">
         <h1 className="text-3xl font-bold text-center mb-2 text-primary-700">
-          सेवासाथीमा साइन अप गर्नुहोस्
+          {t('registerTitle')}
         </h1>
         <p className="text-center text-gray-600 mb-8">आपको खाता सिर्जना गर्नुहोस्</p>
 
@@ -66,7 +68,7 @@ export default function Register() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-gray-700 font-semibold mb-2">नाम</label>
+            <label className="block text-gray-700 font-semibold mb-2">{t('name')}</label>
             <input
               type="text"
               name="name"
@@ -79,7 +81,7 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="block text-gray-700 font-semibold mb-2">ईमेल</label>
+            <label className="block text-gray-700 font-semibold mb-2">{t('email')}</label>
             <input
               type="email"
               name="email"
@@ -92,7 +94,7 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="block text-gray-700 font-semibold mb-2">पासवर्ड</label>
+            <label className="block text-gray-700 font-semibold mb-2">{t('password')}</label>
             <input
               type="password"
               name="password"

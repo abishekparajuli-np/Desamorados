@@ -1,8 +1,10 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import { Star, MapPin, Heart } from 'lucide-react'
+import { useLanguage } from '../context/LanguageContext'
 
 export default function ProviderCard({ provider, user }) {
+  const { t } = useLanguage()
   return (
     <div className="provider-card-hover bg-white rounded-lg overflow-hidden border border-gray-200">
       {/* Provider Photo */}
@@ -18,7 +20,7 @@ export default function ProviderCard({ provider, user }) {
         {/* Women First Badge */}
         {user?.is_female && (
           <div className="absolute top-2 right-2 women-first-badge">
-            <span>💜 Women First</span>
+            <span>💜 {t('womenFirst')}</span>
           </div>
         )}
         
@@ -72,13 +74,13 @@ export default function ProviderCard({ provider, user }) {
             to={`/provider/${provider?.id}`}
             className="flex-1 px-3 py-2 bg-primary-100 text-primary-700 rounded-lg font-semibold hover:bg-primary-200 transition-colors text-sm text-center"
           >
-            View Profile
+            {t('viewProfile')}
           </Link>
           <Link
             to="/booking"
             className="flex-1 px-3 py-2 bg-primary-700 text-white rounded-lg font-semibold hover:bg-primary-800 transition-colors text-sm text-center"
           >
-            Book Now
+            {t('bookNow')}
           </Link>
         </div>
       </div>

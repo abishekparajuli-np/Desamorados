@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react'
 import { Calendar, MapPin, DollarSign, Star, Plus } from 'lucide-react'
 import api from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
+import { useLanguage } from '../../context/LanguageContext'
 
 export default function CustomerDashboard() {
+  const { t } = useLanguage()
   const { user } = useAuth()
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(false)
@@ -63,7 +65,7 @@ export default function CustomerDashboard() {
                 : 'bg-white border border-gray-300 text-gray-700'
             }`}
           >
-            सक्रिय बुकिङहरू
+            {t('activeBookings')}
           </button>
           <button
             onClick={() => setActiveTab('completed')}
@@ -73,7 +75,7 @@ export default function CustomerDashboard() {
                 : 'bg-white border border-gray-300 text-gray-700'
             }`}
           >
-            पूरा भएका बुकिङहरू
+            {t('pastBookings')}
           </button>
         </div>
 
@@ -137,9 +139,9 @@ export default function CustomerDashboard() {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <p className="text-gray-600 text-lg mb-4">कोनै बुकिङहरू नहिंसे</p>
+            <p className="text-gray-600 text-lg mb-4">{t('noBookings')}</p>
             <a href="/services" className="inline-block px-6 py-3 bg-primary-700 text-white rounded-lg font-semibold hover:bg-primary-800">
-              सेवा बुक गर्नुहोस्
+              {t('bookService')}
             </a>
           </div>
         )}
