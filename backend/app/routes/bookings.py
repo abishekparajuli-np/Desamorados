@@ -13,78 +13,113 @@ def create_booking():
     """Create a new booking"""
     try:
         user_id = int(get_jwt_identity())
-        user = User.query.get(user_id)
-        
-        if not user or user.role != 'customer':
-            return jsonify({"error": "Only customers can create bookings", "code": "UNAUTHORIZED"}), 403
-        
         data = request.get_json()
-        
-        # Validate required fields
-        if not data or not data.get('provider_id'):
-            return jsonify({"error": "Missing required fields", "code": "VALIDATION_ERROR"}), 400
-        
-        # Verify provider
-        provider_user = User.query.get(data['provider_id'])
-        if not provider_user or provider_user.role != 'provider':
-            return jsonify({"error": "Provider not found", "code": "NOT_FOUND"}), 404
-        
-        provider = Provider.query.filter_by(user_id=provider_user.id).first()
-        if not provider:
-            return jsonify({"error": "Provider profile not found", "code": "NOT_FOUND"}), 404
-        
-        # If service_id is provided, verify it
-        service = None
-        if data.get('service_id'):
-            service = Service.query.get(data['service_id'])
-            if not service or service.provider_id != provider.id:
-                return jsonify({"error": "Service not found", "code": "NOT_FOUND"}), 404
-        
-        # Create booking
+
+        provider_id = data.get('provider_id')
+        service_id = data.get('service_id')
+
+        if not provider_id:
+            return jsonify({'error': 'provider_id required'}), 400
+
+        # Auto-resolve service_id if not provided
+        if not service_id:
+            auto_service = Service.query.filter_by(
+                is_active=True
+            ).join(
+                Provider, Service.provider_id == Provider.id
+            ).filter(
+                Provider.user_id == provider_id
+            ).first()
+
+            if auto_service:
+                service_id = auto_service.id
+            else:
+                # Create a default service
+                provider = Provider.query.filter_by(
+                    user_id=provider_id
+                ).first()
+                if not provider:
+                    return jsonify({'error': 'Provider not found'}), 404
+
+                from app.models import ServiceCategory
+                cat = ServiceCategory.query.first()
+                if not cat:
+                    return jsonify({'error': 'No service categories'}), 400
+
+                svc = Service(
+                    provider_id=provider.id,
+                    category_id=cat.id,
+                    title='General Service',
+                    description='Home service',
+                    price=float(data.get('final_price', 500) or 500),
+                    price_type='fixed',
+                    is_active=True
+                )
+                db.session.add(svc)
+                db.session.flush()
+                service_id = svc.id
+
+        # Parse scheduled_at safely
+        scheduled_at = None
+        raw_dt = data.get('scheduled_at')
+        if raw_dt:
+            for fmt in ['%Y-%m-%dT%H:%M', '%Y-%m-%dT%H:%M:%S',
+                        '%Y-%m-%d %H:%M:%S', '%Y-%m-%d']:
+                try:
+                    scheduled_at = datetime.strptime(
+                        raw_dt.replace('Z','').split('+')[0].strip(), fmt
+                    )
+                    break
+                except:
+                    continue
+        if not scheduled_at:
+            scheduled_at = datetime.now()
+
         booking = Booking(
             customer_id=user_id,
-            provider_id=provider_user.id,
-            service_id=service.id if service else None,
-            status=data.get('status', 'pending'),
-            scheduled_at=datetime.fromisoformat(data['scheduled_at']) if data.get('scheduled_at') else None,
-            address=data.get('address'),
+            provider_id=provider_id,
+            service_id=service_id,
+            status='pending',
+            scheduled_at=scheduled_at,
+            address=data.get('address', ''),
             latitude=data.get('latitude'),
             longitude=data.get('longitude'),
-            description=data.get('description'),
-            final_price=data.get('final_price', service.price if service else 0),
+            description=data.get('description', ''),
             ai_extracted_data=data.get('ai_extracted_data', {}),
+            final_price=float(data.get('final_price', 0) or 0),
+            payment_status='pending',
             notes=data.get('notes')
         )
-        
         db.session.add(booking)
         db.session.commit()
-        
-        # Return booking with provider details
+
+        # Return provider contact details with booking
+        provider = Provider.query.filter_by(user_id=provider_id).first()
+        provider_user = User.query.get(provider_id)
+
         return jsonify({
             'data': {
                 'booking': booking.to_dict(),
                 'provider': {
-                    'id': provider_user.id,
-                    'name': provider_user.name,
-                    'email': provider_user.email,
-                    'phone': provider_user.phone,
-                    'city': provider_user.city,
-                    'is_female': provider_user.is_female,
-                    'profile_photo': provider_user.profile_photo,
-                    'rating': provider.rating,
-                    'trust_badge': provider.trust_badge,
+                    'id': provider_user.id if provider_user else None,
+                    'name': provider_user.name if provider_user else '',
+                    'email': provider_user.email if provider_user else '',
+                    'phone': provider_user.phone if provider_user else '',
+                    'city': provider_user.city if provider_user else '',
+                    'is_female': provider_user.is_female if provider_user else False,
+                    'profile_photo': provider_user.profile_photo if provider_user else None,
+                    'rating': float(provider.rating) if provider else 0,
+                    'trust_badge': provider.trust_badge if provider else 'New',
                 }
             },
             'message': 'Booking created successfully'
         }), 201
-    
-    except ValueError as e:
-        return jsonify({"error": f"Invalid date format: {str(e)}", "code": "VALIDATION_ERROR"}), 400
+
     except Exception as e:
         db.session.rollback()
         import traceback
         print(traceback.format_exc())
-        return jsonify({"error": str(e), "code": "CREATE_ERROR"}), 500
+        return jsonify({'error': str(e), 'code': 'BOOKING_ERROR'}), 500
 
 
 @bp.route('/my', methods=['GET'])

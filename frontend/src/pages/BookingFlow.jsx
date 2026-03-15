@@ -25,18 +25,23 @@ export default function BookingFlow() {
     setLoading(true)
 
     try {
-      const payload = {
-        provider_id: providerId,
-        description: bookingData.description,
-        address: bookingData.address,
+      const bookingPayload = {
+        provider_id: parseInt(providerId) || undefined,
+        description: bookingData.description || '',
+        address: bookingData.address || '',
         scheduled_at: `${bookingData.scheduledDate}T${bookingData.scheduledTime}:00`,
         status: 'pending'
       }
 
-      const response = await client.post('/api/bookings', payload)
-      const data = response.data?.data || response.data
+      // Remove undefined keys
+      const cleanPayload = Object.fromEntries(
+        Object.entries(bookingPayload).filter(([_, v]) => v !== undefined)
+      )
+
+      const response = await client.post('/api/bookings', cleanPayload)
+      const responseData = response.data?.data || response.data
       
-      setConfirmedBooking(data)
+      setConfirmedBooking(responseData)
       setCurrentStep(7)
     } catch (err) {
       setError(err.response?.data?.error || 'Booking failed. Please try again.')
