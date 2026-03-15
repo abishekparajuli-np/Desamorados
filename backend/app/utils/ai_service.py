@@ -8,15 +8,31 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+DEPRECATED_GROQ_MODELS = {
+    "llama-3.1-70b-versatile": "llama-3.3-70b-versatile",
+    "llama-3.1-70b-specdec": "llama-3.3-70b-specdec",
+    "llama3-70b-8192": "llama-3.3-70b-versatile",
+}
+
+
+def _resolve_groq_model(model_name):
+    """Swap deprecated Groq model IDs to their supported successors."""
+    resolved = DEPRECATED_GROQ_MODELS.get(model_name, model_name)
+    if resolved != model_name:
+        logger.warning(f"Groq model '{model_name}' deprecated; using '{resolved}' instead")
+    return resolved
+
+
 class AIService:
-    """Wrapper for AI APIs - Primary: Groq Llama 3.2 70B, Fallback: Anthropic Claude"""
-    
+    """Wrapper for AI APIs - Primary: Groq Llama 3.3 70B, Fallback: Anthropic Claude"""
+
     def __init__(self):
         # Primary: Groq for text-based AI
         groq_key = os.getenv("GROQ_API_KEY")
         self.groq_client = Groq(api_key=groq_key) if groq_key else None
-        self.groq_model = os.getenv("GROQ_MODEL", "llama-3.1-70b-versatile")
-        
+        requested_model = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+        self.groq_model = _resolve_groq_model(requested_model)
+
         # Fallback: Anthropic for image analysis
         self.client = Anthropic()
         self.model = os.getenv("AI_MODEL", "claude-sonnet-4-20250514")

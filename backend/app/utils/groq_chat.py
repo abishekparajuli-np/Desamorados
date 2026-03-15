@@ -19,14 +19,29 @@ SERVICE_CATEGORIES = {
 }
 
 
+DEPRECATED_GROQ_MODELS = {
+    'llama-3.1-70b-versatile': 'llama-3.3-70b-versatile',
+    'llama-3.1-70b-specdec': 'llama-3.3-70b-specdec',
+    'llama3-70b-8192': 'llama-3.3-70b-versatile',
+}
+
+
+def _resolve_groq_model(model_name):
+    """Swap deprecated Groq model IDs to their supported successors."""
+    resolved = DEPRECATED_GROQ_MODELS.get(model_name, model_name)
+    if resolved != model_name:
+        logger.warning(f"Groq model '{model_name}' deprecated; using '{resolved}' instead")
+    return resolved
+
+
 class GroqChatService:
     def __init__(self):
         api_key = os.getenv('GROQ_API_KEY')
         if not api_key:
             raise ValueError("GROQ_API_KEY not set")
         self.client = Groq(api_key=api_key)
-        # Using Groq Llama 3.1 70B versatile model
-        self.model = os.getenv('GROQ_MODEL', 'llama-3.1-70b-versatile')
+        requested_model = os.getenv('GROQ_MODEL', 'llama-3.3-70b-versatile')
+        self.model = _resolve_groq_model(requested_model)
         logger.info(f'Groq initialized with model: {self.model}')
 
     def detect_service_intent(self, text):
