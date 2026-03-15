@@ -26,23 +26,26 @@ export default function Register() {
     setError('')
     setLoading(true)
 
-    const result = await register(
-      formData.name,
-      formData.email,
-      formData.password,
-      formData.role,
-      formData.gender,
-      formData.city
-    )
-
-    if (result.success) {
-      const redirectPath = result.user.role === 'provider' ? '/dashboard/provider' : '/dashboard/customer'
-      navigate(redirectPath)
-    } else {
-      setError(result.error)
+    try {
+      const data = await register(
+        formData.name,
+        formData.email,
+        formData.password,
+        formData.role,
+        formData.gender,
+        formData.city
+      )
+      
+      const role = data.user?.role
+      if (role === 'admin') navigate('/admin')
+      else if (role === 'provider') navigate('/dashboard/provider')
+      else navigate('/dashboard/customer')
+      
+    } catch (err) {
+      setError(err.response?.data?.error || 'Registration failed')
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   const nepaliCities = ['काठमाडौ', 'ललितपुर', 'भक्तपुर', 'पोखरा', 'वीरगंज', 'जनकपुर']

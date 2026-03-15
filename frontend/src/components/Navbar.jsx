@@ -43,6 +43,17 @@ export default function Navbar() {
               Services
             </Link>
 
+            {isAuthenticated && (
+              <Link 
+                to="/find-nearby" 
+                className={`flex items-center gap-1 text-sm font-medium ${
+                  isActive('/find-nearby') ? 'text-primary-700 font-semibold' : 'text-gray-600 hover:text-primary-700'
+                }`}
+              >
+                🗺️ Find Nearby
+              </Link>
+            )}
+
             {!isAuthenticated ? (
               <>
                 <Link 

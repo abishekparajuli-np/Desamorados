@@ -10,6 +10,7 @@ import Register from './pages/Register'
 import Services from './pages/Services'
 import ProviderProfile from './pages/ProviderProfile'
 import BookingFlow from './pages/BookingFlow'
+import FindNearby from './pages/FindNearby'
 import AdminDashboard from './pages/AdminDashboard'
 import CustomerDashboard from './pages/Dashboard/CustomerDashboard'
 import ProviderDashboard from './pages/Dashboard/ProviderDashboard'
@@ -55,6 +56,14 @@ function AppContent() {
           <Route path="/provider/:id" element={<ProviderProfile />} />
 
           {/* Customer Routes */}
+          <Route 
+            path="/find-nearby" 
+            element={
+              <ProtectedRoute>
+                <FindNearby />
+              </ProtectedRoute>
+            } 
+          />
           <Route 
             path="/booking" 
             element={

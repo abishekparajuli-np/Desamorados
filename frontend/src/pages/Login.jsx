@@ -15,16 +15,20 @@ export default function Login() {
     setError('')
     setLoading(true)
 
-    const result = await login(email, password)
-
-    if (result.success) {
-      const redirectPath = result.user.role === 'provider' ? '/dashboard/provider' : '/dashboard/customer'
-      navigate(redirectPath)
-    } else {
-      setError(result.error)
+    try {
+      const data = await login(email, password)
+      
+      // Redirect based on role
+      const role = data.user?.role
+      if (role === 'admin') navigate('/admin')
+      else if (role === 'provider') navigate('/dashboard/provider')
+      else navigate('/dashboard/customer')
+      
+    } catch (err) {
+      setError(err.response?.data?.error || 'Login failed')
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   return (

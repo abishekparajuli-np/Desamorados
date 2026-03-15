@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom'
 import { Search, Users, Shield, MapPin, Zap } from 'lucide-react'
 import ProviderCard from '../components/ProviderCard'
 import api from '../api/client'
+import { useAuth } from '../context/AuthContext'
 
 export default function Home() {
+  const { isAuthenticated } = useAuth()
   const [featuredProviders, setFeaturedProviders] = useState([])
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(false)
@@ -87,6 +89,18 @@ export default function Home() {
               </button>
             </div>
           </form>
+
+          {/* Find Nearby Button */}
+          {isAuthenticated && (
+            <div className="text-center mt-4">
+              <a href="/find-nearby"
+                className="inline-flex items-center gap-2 bg-white text-primary-700 
+                           font-semibold px-6 py-3 rounded-xl shadow-md 
+                           hover:shadow-lg transition-all border border-primary-100">
+                🗺️ Find Providers Near Me
+              </a>
+            </div>
+          )}
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 mt-16 text-center">
