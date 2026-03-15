@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { Star, MapPin, Award, TrendingUp } from 'lucide-react'
 import api from '../api/client'
+import { useLanguage } from '../context/LanguageContext'
 import Loading from '../components/Loading'
+import PhotoUpload from '../components/PhotoUpload'
 
 export default function ProviderProfile() {
+  const { t } = useLanguage()
   const { id } = useParams()
   const [provider, setProvider] = useState(null)
   const [reviews, setReviews] = useState([])
@@ -32,7 +35,7 @@ export default function ProviderProfile() {
   }
 
   if (loading) return <Loading />
-  if (!provider) return <div className="text-center py-12">सेवा प्रदान गर्नेहरू नहिंसे</div>
+  if (!provider) return <div className="text-center py-12">{t('providerNotFound')}</div>
 
   const user = { name: provider.name, city: provider.city, profile_photo: provider.profile_photo, is_female: provider.is_female }
 
@@ -42,7 +45,11 @@ export default function ProviderProfile() {
         {/* Header */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
           <div className="h-48 bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center">
-            <span className="text-9xl">👤</span>
+            {provider.profile_photo ? (
+              <img src={provider.profile_photo} alt={provider.name} className="w-40 h-40 rounded-full object-cover" />
+            ) : (
+              <span className="text-9xl">👤</span>
+            )}
           </div>
 
           <div className="p-8">
@@ -54,11 +61,11 @@ export default function ProviderProfile() {
                     <MapPin size={20} className="text-primary-700" />
                     <span className="text-gray-600">{user.city}</span>
                   </div>
-                  {user.is_female && <span className="women-first-badge">💜 महिला पहिले</span>}
+                  {user.is_female && <span className="women-first-badge">💜 {t('womenFirst')}</span>}
                 </div>
               </div>
               <button className="px-6 py-3 bg-primary-700 text-white rounded-lg font-semibold hover:bg-primary-800">
-                अभी बुक गर्नुहोस्
+                {t('bookNow')}
               </button>
             </div>
 
@@ -74,11 +81,11 @@ export default function ProviderProfile() {
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-primary-700">{provider.provider?.total_jobs}</div>
-                <p className="text-gray-600 text-sm">कुल कामहरू</p>
+                <p className="text-gray-600 text-sm">{t('totalJobs')}</p>
               </div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-primary-700">{provider.provider?.trust_score}</div>
-                <p className="text-gray-600 text-sm">विश्वास स्कोर</p>
+                <p className="text-gray-600 text-sm">{t('trustScore')}</p>
               </div>
               <div className="text-center">
                 <div className="text-2xl">

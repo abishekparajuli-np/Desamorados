@@ -2,11 +2,14 @@ import React, { useState } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { useLanguage } from '../context/LanguageContext'
 import client from '../api/client'
+import LocationStep from '../components/LocationStep'
 
 export default function BookingFlow() {
   const { t } = useLanguage()
   const [searchParams] = useSearchParams()
   const providerId = searchParams.get('provider_id')
+  const paramLat = searchParams.get('lat')
+  const paramLng = searchParams.get('lng')
   const [currentStep, setCurrentStep] = useState(1)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -14,6 +17,8 @@ export default function BookingFlow() {
 
   const [bookingData, setBookingData] = useState({
     address: '',
+    lat: paramLat ? parseFloat(paramLat) : null,
+    lng: paramLng ? parseFloat(paramLng) : null,
     description: '',
     scheduledDate: '',
     scheduledTime: ''
@@ -29,6 +34,8 @@ export default function BookingFlow() {
         provider_id: parseInt(providerId) || undefined,
         description: bookingData.description || '',
         address: bookingData.address || '',
+        latitude: bookingData.lat || undefined,
+        longitude: bookingData.lng || undefined,
         scheduled_at: `${bookingData.scheduledDate}T${bookingData.scheduledTime}:00`,
         status: 'pending'
       }
@@ -189,26 +196,21 @@ export default function BookingFlow() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             
-            {/* Step 1: Your Address */}
+            {/* Step 1: Location Picker */}
             <div className="space-y-4">
               <label className="block text-sm font-medium text-gray-700">
                 {t('yourAddress')}
               </label>
-              <input
-                type="text"
-                value={bookingData.address || ''}
-                onChange={(e) => setBookingData({...bookingData, address: e.target.value})}
-                placeholder="Enter your full address in Kathmandu..."
-                className="w-full border border-gray-200 rounded-xl px-4 py-3 
-                           text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                required
+              <LocationStep
+                onLocationSelect={(location) => {
+                  setBookingData({
+                    ...bookingData,
+                    address: location.address,
+                    lat: location.lat,
+                    lng: location.lng
+                  })
+                }}
               />
-              <p className="text-xs text-gray-500">
-                💡 Need to find a provider near you? 
-                <a href="/find-nearby" className="text-purple-600 font-medium ml-1">
-                  Use Find Nearby Map →
-                </a>
-              </p>
             </div>
 
             {/* Step 2: Describe Issue */}

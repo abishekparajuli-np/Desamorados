@@ -190,7 +190,11 @@ export default function FindNearby() {
                   <button
                     onClick={(e) => {
                       e.stopPropagation()
-                      navigate(`/booking?provider_id=${provider.id}`)
+                      const params = new URLSearchParams({
+                        provider_id: provider.id,
+                        ...(userLocation && { lat: userLocation.lat, lng: userLocation.lng })
+                      })
+                      navigate(`/booking?${params.toString()}`)
                     }}
                     className="flex-1 bg-purple-600 text-white text-xs 
                                font-semibold py-2 rounded-lg hover:bg-purple-700 transition"

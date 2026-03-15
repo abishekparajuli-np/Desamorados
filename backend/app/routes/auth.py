@@ -127,3 +127,93 @@ def get_current_user():
     
     except Exception as e:
         return jsonify({"error": str(e), "code": "FETCH_ERROR"}), 500
+
+
+@bp.route('/profile', methods=['PUT'])
+@jwt_required()
+def update_profile():
+    """Update user profile"""
+    try:
+        user_id = int(get_jwt_identity())
+        user = User.query.get(user_id)
+        
+        if not user:
+            return jsonify({"error": "User not found", "code": "NOT_FOUND"}), 404
+        
+        data = request.get_json()
+        
+        # Update allowed fields
+        for field in ['name', 'phone', 'city', 'address', 'bio']:
+            if field in data:
+                setattr(user, field, data[field])
+        
+        db.session.commit()
+        
+        return jsonify({
+            "data": user.to_dict(),
+            "message": "Profile updated successfully"
+        }), 200
+    
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e), "code": "UPDATE_ERROR"}), 500
+
+
+@bp.route('/upload-photo', methods=['POST'])
+@jwt_required()
+def upload_photo():
+    """Upload user profile photo"""
+    import os
+    from werkzeug.utils import secure_filename
+    
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+    UPLOAD_FOLDER = 'uploads/profiles'
+    
+    def allowed_file(filename):
+        return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+    
+    try:
+        user_id = int(get_jwt_identity())
+        user = User.query.get(user_id)
+        
+        if not user:
+            return jsonify({"error": "User not found", "code": "NOT_FOUND"}), 404
+        
+        if 'photo' not in request.files:
+            return jsonify({'error': 'No photo provided'}), 400
+        
+        file = request.files['photo']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        if not allowed_file(file.filename):
+            return jsonify({'error': 'Invalid file type. Allowed: png, jpg, jpeg, gif, webp'}), 400
+        
+        # Check file size (max 5MB)
+        file.seek(0, 2)
+        size = file.tell()
+        file.seek(0)
+        if size > 5 * 1024 * 1024:
+            return jsonify({'error': 'File too large (max 5MB)'}), 400
+        
+        # Ensure upload directory exists
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        
+        # Save file with user ID in filename
+        filename = secure_filename(f"user_{user_id}_{file.filename}")
+        filepath = os.path.join(UPLOAD_FOLDER, filename)
+        file.save(filepath)
+        
+        # Save URL to user profile
+        photo_url = f"/uploads/profiles/{filename}"
+        user.profile_photo = photo_url
+        db.session.commit()
+        
+        return jsonify({
+            'data': {'photo_url': photo_url},
+            'message': 'Photo uploaded successfully'
+        }), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+

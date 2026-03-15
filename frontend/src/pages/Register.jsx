@@ -58,7 +58,7 @@ export default function Register() {
         <h1 className="text-3xl font-bold text-center mb-2 text-primary-700">
           {t('registerTitle')}
         </h1>
-        <p className="text-center text-gray-600 mb-8">आपको खाता सिर्जना गर्नुहोस्</p>
+        <p className="text-center text-gray-600 mb-8">{t('registerSubtitle')}</p>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
@@ -67,6 +67,12 @@ export default function Register() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Photo Upload Note */}
+          <div className="text-center mb-6 p-4 bg-blue-50 rounded-lg">
+            <p className="text-gray-700 text-sm">{t('photoOptional')}</p>
+            <p className="text-xs text-gray-500 mt-2">{t('photoCanUpdate')}</p>
+          </div>
+
           <div>
             <label className="block text-gray-700 font-semibold mb-2">{t('name')}</label>
             <input
@@ -107,42 +113,42 @@ export default function Register() {
           </div>
 
           <div>
-            <label className="block text-gray-700 font-semibold mb-2">भूमिका</label>
+            <label className="block text-gray-700 font-semibold mb-2">{t('role')}</label>
             <select
               name="role"
               value={formData.role}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
-              <option value="customer">ग्राहक</option>
-              <option value="provider">सेवा प्रदान गर्नेहरू</option>
+              <option value="customer">{t('customer')}</option>
+              <option value="provider">{t('provider')}</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-gray-700 font-semibold mb-2">लिङ्ग</label>
+            <label className="block text-gray-700 font-semibold mb-2">{t('gender')}</label>
             <select
               name="gender"
               value={formData.gender}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
-              <option value="">चयन गर्नुहोस्</option>
-              <option value="male">पुरुष</option>
-              <option value="female">महिला</option>
-              <option value="other">अन्य</option>
+              <option value="">{t('selectGender')}</option>
+              <option value="male">{t('male')}</option>
+              <option value="female">{t('female')}</option>
+              <option value="other">{t('other')}</option>
             </select>
           </div>
 
           <div>
-            <label className="block text-gray-700 font-semibold mb-2">शहर</label>
+            <label className="block text-gray-700 font-semibold mb-2">{t('city')}</label>
             <select
               name="city"
               value={formData.city}
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
-              <option value="">चयन गर्नुहोस्</option>
+              <option value="">{t('selectCity')}</option>
               {nepaliCities.map(city => (
                 <option key={city} value={city}>{city}</option>
               ))}
@@ -154,14 +160,14 @@ export default function Register() {
             disabled={loading}
             className="w-full bg-primary-700 text-white font-semibold py-3 rounded-lg hover:bg-primary-800 transition-colors disabled:opacity-50 mt-6"
           >
-            {loading ? 'साइन अप हो रहेको छ...' : 'साइन अप गर्नुहोस्'}
+            {loading ? t('signingUp') : t('register')}
           </button>
         </form>
 
         <p className="text-center text-gray-600 mt-6">
-          पहिले सदस्य?{' '}
+          {t('alreadyMember')}{' '}
           <Link to="/login" className="text-primary-700 font-semibold hover:underline">
-            लग इन गर्नुहोस्
+            {t('login')}
           </Link>
         </p>
       </div>

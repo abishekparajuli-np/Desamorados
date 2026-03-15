@@ -48,6 +48,13 @@ def create_app(config_name="development"):
     app.register_blueprint(reviews.bp)
     app.register_blueprint(ai.bp)
     
+    # Static file serving for uploads
+    from flask import send_from_directory
+    
+    @app.route('/uploads/<path:filename>')
+    def serve_upload(filename):
+        return send_from_directory('uploads', filename)
+    
     # Create tables
     with app.app_context():
         db.create_all()

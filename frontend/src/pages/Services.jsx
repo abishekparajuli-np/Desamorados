@@ -16,13 +16,16 @@ export default function Services() {
     city: searchParams.get('city') || '',
     women_first: searchParams.get('women_first') === 'true',
     min_rating: 0,
+    category_id: searchParams.get('category_id') || '',
     page: 1
   })
   const [cities, setCities] = useState([])
+  const [categories, setCategories] = useState([])
 
   useEffect(() => {
     loadProviders()
     loadCities()
+    loadCategories()
   }, [filters])
 
   const loadCities = async () => {
@@ -57,6 +60,9 @@ export default function Services() {
       if (filters.city && filters.city !== '') {
         params.city = filters.city
       }
+      if (filters.category_id && filters.category_id !== '') {
+        params.category_id = filters.category_id
+      }
       const response = await api.get('/api/providers', { params })
       const data =
         response.data?.data?.providers ||
@@ -69,6 +75,16 @@ export default function Services() {
       console.error('Failed to load providers:', error)
     } finally {
       setLoading(false)
+    }
+  }
+  
+  const loadCategories = async () => {
+    try {
+      const response = await api.get('/api/services/categories')
+      const data = response.data?.data || response.data || []
+      setCategories(Array.isArray(data) ? data : [])
+    } catch (error) {
+      console.error('Failed to load categories:', error)
     }
   }
 
@@ -151,9 +167,29 @@ export default function Services() {
                 </select>
               </div>
 
+              {/* Category Filter */}
+              <div className="mb-6">
+                <label className="block font-semibold mb-3">{t('filterByCategory')}</label>
+                <select
+                  value={filters.category_id}
+                  onChange={(e) => setFilters(prev => ({
+                    ...prev,
+                    category_id: e.target.value,
+                    page: 1
+                  }))}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 
+                             focus:outline-none focus:ring-2 focus:ring-purple-500"
+                >
+                  <option value="">{t('allCategories')}</option>
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+
               {/* Reset */}
               <button
-                onClick={() => setFilters({ city: '', women_first: false, min_rating: 0, page: 1 })}
+                onClick={() => setFilters({ city: '', women_first: false, min_rating: 0, category_id: '', page: 1 })}
                 className="w-full px-4 py-2 border-2 border-gray-300 text-gray-700 
                            rounded-lg font-semibold hover:bg-gray-100 transition-colors"
               >

@@ -10,6 +10,13 @@ import random
 
 app = create_app('development')
 
+def get_avatar(name, is_female=False):
+    """Generate avatar URL from UI Avatars API"""
+    bg = 'C084FC' if is_female else '6366F1'  # purple for women, indigo for men
+    color = 'ffffff'
+    name_encoded = name.replace(' ', '+')
+    return f"https://ui-avatars.com/api/?name={name_encoded}&background={bg}&color={color}&size=200&bold=true&rounded=true"
+
 def seed_database():
     with app.app_context():
         # Clear existing data
@@ -108,7 +115,8 @@ def seed_database():
             phone='9841234567',
             role='admin',
             city='Kathmandu',
-            is_verified=True
+            is_verified=True,
+            profile_photo=get_avatar('Admin User', False)
         )
         admin.set_password('admin123')
         db.session.add(admin)
@@ -131,7 +139,8 @@ def seed_database():
                 gender='female',
                 city=random.choice(['Kathmandu', 'Lalitpur', 'Bhaktapur']),
                 is_verified=True,
-                is_female=True
+                is_female=True,
+                profile_photo=get_avatar(name, True)
             )
             user.set_password('provider123')
             db.session.add(user)
@@ -173,7 +182,8 @@ def seed_database():
                 gender='male',
                 city=random.choice(['Kathmandu', 'Lalitpur', 'Bhaktapur']),
                 is_verified=True,
-                is_female=False
+                is_female=False,
+                profile_photo=get_avatar(name, False)
             )
             user.set_password('provider123')
             db.session.add(user)
@@ -236,7 +246,8 @@ def seed_database():
                 phone=f'986{100000 + i}',
                 role='customer',
                 city=random.choice(['Kathmandu', 'Lalitpur', 'Bhaktapur']),
-                is_verified=True
+                is_verified=True,
+                profile_photo=get_avatar(name, name in ['Laxmi Gupta', 'Meera Sharma'])
             )
             user.set_password('customer123')
             db.session.add(user)

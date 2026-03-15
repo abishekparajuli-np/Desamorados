@@ -47,7 +47,7 @@ export default function Login() {
         <h1 className="text-3xl font-bold text-center mb-2 text-primary-700">
           {t('loginTitle')}
         </h1>
-        <p className="text-center text-gray-600 mb-8">आपको खाता वर्तमान राख्नुहोस्</p>
+        <p className="text-center text-gray-600 mb-8">{t('loginSubtitle')}</p>
 
         {error && (
           <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
@@ -89,22 +89,22 @@ export default function Login() {
             disabled={loading}
             className="w-full bg-primary-700 text-white font-semibold py-3 rounded-lg hover:bg-primary-800 transition-colors disabled:opacity-50"
           >
-            {loading ? 'लग इन हो रहेको छ...' : t('login')}
+            {loading ? t('signingIn') : t('login')}
           </button>
         </form>
 
         <p className="text-center text-gray-600 mt-6">
-          {t('noAccount')}{' '}
+          {t('dontHaveAccount')}{' '}
           <Link to="/register" className="text-primary-700 font-semibold hover:underline">
-            {t('signUp')}
+            {t('register')}
           </Link>
         </p>
 
         {/* Demo Credentials */}
         <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
-          <p className="text-sm font-semibold text-blue-900 mb-2">डेमो खाता:</p>
-          <p className="text-xs text-blue-800">ग्राहक: customer1@sewasathi.com / customer123</p>
-          <p className="text-xs text-blue-800">प्रदान गर्नेहरू: provider1@sewasathi.com / provider123</p>
+          <p className="text-sm font-semibold text-blue-900 mb-2">{t('demoAccounts')}:</p>
+          <p className="text-xs text-blue-800">{t('customer')}: customer1@sewasathi.com / customer123</p>
+          <p className="text-xs text-blue-800">{t('provider')}: provider1@sewasathi.com / provider123</p>
         </div>
       </div>
     </div>

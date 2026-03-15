@@ -4,13 +4,25 @@ import api from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
 import ChatWithProvider from '../../components/ChatWithProvider'
+import PhotoUpload from '../../components/PhotoUpload'
 
 export default function CustomerDashboard() {
   const { t } = useLanguage()
-  const { user } = useAuth()
+  const { user, updateUser } = useAuth()
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(false)
   const [activeTab, setActiveTab] = useState('active')
+
+  const handlePhotoUpload = async () => {
+    try {
+      // Refetch user from backend
+      const response = await api.get('/api/auth/me')
+      const updatedUser = response.data?.data || response.data
+      updateUser(updatedUser)
+    } catch (error) {
+      console.error('Failed to refresh user after photo upload:', error)
+    }
+  }
 
   useEffect(() => {
     loadBookings()
@@ -53,8 +65,17 @@ export default function CustomerDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold mb-2">सेवा खरिद डैशबोर्ड</h1>
-        <p className="text-gray-600 mb-8">नमस्ते, {user?.name}!</p>
+        <div className="flex items-center gap-6 mb-8">
+          <PhotoUpload 
+            currentPhoto={user?.profile_photo}
+            onUpload={handlePhotoUpload}
+            size="lg"
+          />
+          <div>
+            <h1 className="text-4xl font-bold mb-2">{t('customerDashboard')}</h1>
+            <p className="text-gray-600">{t('helloUser')}, {user?.name}!</p>
+          </div>
+        </div>
 
         {/* Tabs */}
         <div className="flex gap-4 mb-8">
@@ -92,7 +113,7 @@ export default function CustomerDashboard() {
                 <div className="flex justify-between items-start mb-4">
                   <div>
                     <h3 className="text-xl font-bold text-gray-800">{booking.service?.title}</h3>
-                    <p className="text-gray-600">बुकिङ क्र: #{booking.id}</p>
+                    <p className="text-gray-600">{t('bookingNumber')}: #{booking.id}</p>
                   </div>
                   <span className={`px-4 py-2 rounded-full font-semibold text-sm ${getStatusColor(booking.status)}`}>
                     {booking.status.replace('_', ' ').toUpperCase()}
@@ -103,30 +124,30 @@ export default function CustomerDashboard() {
                   <div className="flex items-center gap-2">
                     <Calendar className="text-primary-700" size={20} />
                     <div>
-                      <p className="text-sm text-gray-600">मिति</p>
+                      <p className="text-sm text-gray-600">{t('date')}</p>
                       <p className="font-semibold">
-                        {booking.scheduled_at ? new Date(booking.scheduled_at).toLocaleDateString('ne-NP') : 'तोकिएको छैन'}
+                        {booking.scheduled_at ? new Date(booking.scheduled_at).toLocaleDateString('ne-NP') : t('notSet')}
                       </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin className="text-primary-700" size={20} />
                     <div>
-                      <p className="text-sm text-gray-600">स्थान</p>
+                      <p className="text-sm text-gray-600">{t('location')}</p>
                       <p className="font-semibold">{booking.address?.substring(0, 20)}...</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <DollarSign className="text-primary-700" size={20} />
                     <div>
-                      <p className="text-sm text-gray-600">मूल्य</p>
+                      <p className="text-sm text-gray-600">{t('price')}</p>
                       <p className="font-semibold">₨{booking.final_price}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Star className="text-primary-700" size={20} />
                     <div>
-                      <p className="text-sm text-gray-600">स्थिति</p>
+                      <p className="text-sm text-gray-600">{t('status')}</p>
                       <p className="font-semibold">{booking.payment_status}</p>
                     </div>
                   </div>
@@ -135,7 +156,7 @@ export default function CustomerDashboard() {
                 <div className="flex gap-3">
                   <ChatWithProvider booking={booking} provider={booking.provider_details} />
                   <button className="px-6 py-2 bg-primary-700 text-white rounded-lg font-semibold hover:bg-primary-800 transition-colors">
-                    विस्तृत विवरण देखुन्नुहोस्
+                    {t('viewDetails')}
                   </button>
                 </div>
               </div>

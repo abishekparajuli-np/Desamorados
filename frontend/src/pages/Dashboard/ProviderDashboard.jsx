@@ -4,14 +4,26 @@ import { BarChart3, Users, DollarSign, Award } from 'lucide-react'
 import api from '../../api/client'
 import { useAuth } from '../../context/AuthContext'
 import { useLanguage } from '../../context/LanguageContext'
+import PhotoUpload from '../../components/PhotoUpload'
 
 export default function ProviderDashboard() {
   const navigate = useNavigate()
-  const { user } = useAuth()
+  const { user, updateUser } = useAuth()
   const { t } = useLanguage()
   const [bookings, setBookings] = useState([])
   const [stats, setStats] = useState({})
   const [loading, setLoading] = useState(false)
+
+  const handlePhotoUpload = async () => {
+    try {
+      // Refetch user from backend
+      const response = await api.get('/api/auth/me')
+      const updatedUser = response.data?.data || response.data
+      updateUser(updatedUser)
+    } catch (error) {
+      console.error('Failed to refresh user after photo upload:', error)
+    }
+  }
 
   useEffect(() => {
     loadDashboardData()
@@ -67,8 +79,17 @@ export default function ProviderDashboard() {
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-4xl font-bold mb-2">सेवा प्रदान गर्नेहरूको डैशबोर्ड</h1>
-        <p className="text-gray-600 mb-8">नमस्ते, {user?.name}!</p>
+        <div className="flex items-center gap-6 mb-8">
+          <PhotoUpload 
+            currentPhoto={user?.profile_photo}
+            onUpload={handlePhotoUpload}
+            size="lg"
+          />
+          <div>
+            <h1 className="text-4xl font-bold mb-2">{t('providerDashboard')}</h1>
+            <p className="text-gray-600">{t('helloUser')}, {user?.name}!</p>
+          </div>
+        </div>
 
         {/* Stats */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
@@ -78,7 +99,7 @@ export default function ProviderDashboard() {
                 <BarChart3 className="text-blue-700" size={32} />
               </div>
               <div>
-                <p className="text-gray-600">कुल कामहरू</p>
+                <p className="text-gray-600">{t('totalJobs')}</p>
                 <p className="text-3xl font-bold text-gray-800">{stats.totalJobs || 0}</p>
               </div>
             </div>
@@ -90,7 +111,7 @@ export default function ProviderDashboard() {
                 <Users className="text-green-700" size={32} />
               </div>
               <div>
-                <p className="text-gray-600">पूरा भएका कामहरू</p>
+                <p className="text-gray-600">{t('completedJobs')}</p>
                 <p className="text-3xl font-bold text-gray-800">{stats.completedJobs || 0}</p>
               </div>
             </div>
@@ -102,7 +123,7 @@ export default function ProviderDashboard() {
                 <DollarSign className="text-yellow-700" size={32} />
               </div>
               <div>
-                <p className="text-gray-600">कुल आय</p>
+                <p className="text-gray-600">{t('totalEarnings')}</p>
                 <p className="text-3xl font-bold text-gray-800">₨{stats.totalEarnings || 0}</p>
               </div>
             </div>
@@ -114,7 +135,7 @@ export default function ProviderDashboard() {
                 <Award className="text-purple-700" size={32} />
               </div>
               <div>
-                <p className="text-gray-600">औसत रेटिङ</p>
+                <p className="text-gray-600">{t('averageRating')}</p>
                 <p className="text-3xl font-bold text-gray-800">{stats.rating?.toFixed(1) || 0}</p>
               </div>
             </div>
@@ -123,7 +144,7 @@ export default function ProviderDashboard() {
 
         {/* Bookings */}
         <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-bold mb-6">नयाँ बुकिङ अनुरोधहरू</h2>
+          <h2 className="text-2xl font-bold mb-6">{t('pendingBookingRequests')}</h2>
           
           {loading ? (
             <div className="text-center py-12">

@@ -65,10 +65,10 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
             <h1 className="text-5xl md:text-6xl font-bold mb-4">
-              भरोसायोग्य घर सेवा बुक गर्नुहोस्
+              {t('heroTitle_new')}
             </h1>
             <p className="text-xl text-primary-100 mb-8">
-              नेपालमा सर्वश्रेष्ठ घर सेवा प्रदान गर्नेहरूसंग जोडिनुहोस्
+              {t('heroSubtitle_new')}
             </p>
           </div>
 
@@ -79,7 +79,7 @@ export default function Home() {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="सेवा खोज्नुहोस्... (जस्तै: प्लम्बिङ्, सफाई)"
+                placeholder={t('searchPlaceholder_new')}
                 className="flex-1 px-4 py-3 text-black outline-none"
               />
               <button
@@ -87,7 +87,7 @@ export default function Home() {
                 className="bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold hover:bg-primary-800 transition-colors flex items-center gap-2"
               >
                 <Search size={20} />
-                खोज्नुहोस्
+                {t('home')}
               </button>
             </div>
           </form>
@@ -99,7 +99,7 @@ export default function Home() {
                 className="inline-flex items-center gap-2 bg-white text-primary-700 
                            font-semibold px-6 py-3 rounded-xl shadow-md 
                            hover:shadow-lg transition-all border border-primary-100">
-                🗺️ Find Providers Near Me
+                🗺️ {t('findNearby')}
               </a>
             </div>
           )}
@@ -126,31 +126,31 @@ export default function Home() {
       <section className="py-16 px-4 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">
-            सेवासाथीलाई किन चुन्नुहोस्?
+            {t('whyChooseUs')}
           </h2>
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white p-8 rounded-lg shadow-md text-center">
               <div className="text-4xl mb-4">💜</div>
-              <h3 className="text-xl font-bold mb-3 text-primary-700">महिला पहिले</h3>
+              <h3 className="text-xl font-bold mb-3 text-primary-700">{t('womenFirstBanner')}</h3>
               <p className="text-gray-600">
-                हामी महिला सेवा प्रदान गर्नेहरूलाई समर्थन गर्दछौं र तिनीहरूलाई पहिले प्रदर्शन गर्दछौं।
+                {t('womenFirstBannerDesc')}
               </p>
             </div>
 
             <div className="bg-white p-8 rounded-lg shadow-md text-center">
               <div className="text-4xl mb-4">🛡️</div>
-              <h3 className="text-xl font-bold mb-3 text-primary-700">सुरक्षित र भरोसायोग्य</h3>
+              <h3 className="text-xl font-bold mb-3 text-primary-700">Trusted & Verified</h3>
               <p className="text-gray-600">
-                सब सेवा प्रदान गर्नेहरू प्रमाणित र सत्यापित। ग्राहकहरूको समीक्षा र रेटिङ।
+                All providers are verified. Read reviews and ratings from customers.
               </p>
             </div>
 
             <div className="bg-white p-8 rounded-lg shadow-md text-center">
               <div className="text-4xl mb-4">⚡</div>
-              <h3 className="text-xl font-bold mb-3 text-primary-700">तुरन्त बुकिङ</h3>
+              <h3 className="text-xl font-bold mb-3 text-primary-700">Quick Booking</h3>
               <p className="text-gray-600">
-                साधारण, तीव्र, र सुविधाजनक बुकिङ प्रक्रिया। तपाइंको दोरबारमा पेसेवर सेवा।
+                Simple, fast, and convenient booking. Professional service at your door.
               </p>
             </div>
           </div>
@@ -161,14 +161,14 @@ export default function Home() {
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">
-            सेवा श्रेणीहरू
+            {t('servicesTitle')}
           </h2>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {categories.map((cat) => (
               <Link
                 key={cat.name}
-                to={`/services?category=${cat.name}`}
+                to={`/services?category_id=${cat.id}`}
                 className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-all hover:-translate-y-1 text-center"
               >
                 <div className="text-4xl mb-3">{cat.icon}</div>
@@ -183,10 +183,10 @@ export default function Home() {
       <section className="py-16 px-4 bg-gradient-to-r from-purple-50 to-pink-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold mb-4 text-gray-800">
-            💜 शीर्ष महिला सेवा प्रदान गर्नेहरू
+            💜 {t('featuredProviders')}
           </h2>
           <p className="text-gray-600 mb-12">
-            नेपाली महिलाहरूलाई सशक्त गर्न सेवासाथीको प्रतिबद्धता
+            {t('womenFirstBannerDesc')}
           </p>
 
           {loading ? (
@@ -220,15 +220,15 @@ export default function Home() {
       <section className="py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-12 text-gray-800">
-            यो कसरी काम गर्छ?
+            {t('howItWorksTitle')}
           </h2>
 
           <div className="grid md:grid-cols-4 gap-6">
             {[
-              { step: '1', title: 'सेवा खोज्नुहोस्', desc: 'आवश्यक सेवा खोज्नुहोस्' },
-              { step: '2', title: 'प्रदान गर्नेहरू तुलना गर्नुहोस्', desc: 'समीक्षा र मूल्य तुलना गर्नुहोस्' },
-              { step: '3', title: 'बुकिङ गर्नुहोस्', desc: 'तपाइंको सुविधाजनक समयमा बुकिङ गर्नुहोस्' },
-              { step: '4', title: 'समीक्षा दिनुहोस्', desc: 'सेवार पछि समीक्षा दिनुहोस्' }
+              { step: '1', title: t('step1'), desc: t('step1Desc') },
+              { step: '2', title: t('step2'), desc: t('step2Desc') },
+              { step: '3', title: t('step3'), desc: t('step3Desc') },
+              { step: '4', title: 'Leave a Review', desc: 'Share your experience and help others' }
             ].map((item) => (
               <div key={item.step} className="text-center">
                 <div className="w-16 h-16 bg-primary-700 text-white rounded-full flex items-center justify-center text-2xl font-bold mb-4 mx-auto">
@@ -246,23 +246,23 @@ export default function Home() {
       <section className="py-16 px-4 bg-primary-700 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-4">
-            आज सुरु गर्नुहोस्
+            {t('bookService')}
           </h2>
           <p className="text-xl text-primary-100 mb-8">
-            भरोसायोग्य घर सेवा खोज्न केवल कुछ क्लिकमा
+            {t('heroSubtitle_new')}
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
             <Link
               to="/services"
               className="px-8 py-3 bg-white text-primary-700 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
             >
-              सेवा बुक गर्नुहोस्
+              {t('exploreServices')}
             </Link>
             <Link
               to="/register"
               className="px-8 py-3 border-2 border-white text-white rounded-lg font-semibold hover:bg-primary-800 transition-colors"
             >
-              सेवा प्रदान गर्नुहोस्
+              {t('provideService')}
             </Link>
           </div>
         </div>
