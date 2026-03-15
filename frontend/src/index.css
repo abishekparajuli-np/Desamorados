@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Women First Badge */
+.women-first-badge {
+  @apply inline-block px-3 py-1 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 text-sm font-semibold rounded-full border border-purple-300;
+}
+
+/* Trust Badge */
+.trust-badge {
+  @apply inline-block px-2 py-1 bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700 text-xs font-semibold rounded-full border border-blue-300;
+}
+
+/* Provider Card Hover */
+.provider-card-hover {
+  @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+}
+
+/* Button Styles */
+.btn-primary {
+  @apply px-4 py-2 bg-primary-700 text-white font-semibold rounded-lg hover:bg-primary-800 transition-colors;
+}
+
+.btn-secondary {
+  @apply px-4 py-2 bg-gray-200 text-gray-800 font-semibold rounded-lg hover:bg-gray-300 transition-colors;
+}
+
+.btn-outline {
+  @apply px-4 py-2 border-2 border-primary-700 text-primary-700 font-semibold rounded-lg hover:bg-primary-50 transition-colors;
+}
+
+/* Floating Action Button */
+.fab {
+  @apply fixed bottom-6 right-6 w-16 h-16 rounded-full shadow-lg hover:shadow-xl transition-all z-40;
+}
+
+/* Smooth Scroll */
+.scroll-smooth {
+  scroll-behavior: smooth;
+}
+
+/* Fade Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Pulse Animation */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Loading Spinner */
+.spinner {
+  @apply inline-block w-4 h-4 border-2 border-gray-300 border-t-primary-700 rounded-full;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Toast Styles */
+.toast {
+  @apply fixed top-4 right-4 px-6 py-3 bg-white rounded-lg shadow-lg border-l-4;
+  animation: slideIn 0.3s ease-out;
+}
+
+.toast.success {
+  @apply border-l-green-500 bg-green-50;
+}
+
+.toast.error {
+  @apply border-l-red-500 bg-red-50;
+}
+
+.toast.info {
+  @apply border-l-blue-500 bg-blue-50;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
